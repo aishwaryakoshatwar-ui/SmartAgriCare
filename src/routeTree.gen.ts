@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CropsRouteImport } from './routes/crops'
+import { Route as LivestockRouteImport } from './routes/livestock'
 import { Route as SoilRouteImport } from './routes/soil'
 import { Route as WaterRouteImport } from './routes/water'
+import { Route as WeatherRouteImport } from './routes/weather'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const CropsRoute = CropsRouteImport.update({
   id: '/crops',
   path: '/crops',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LivestockRoute = LivestockRouteImport.update({
+  id: '/livestock',
+  path: '/livestock',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SoilRoute = SoilRouteImport.update({
@@ -34,39 +41,53 @@ const WaterRoute = WaterRouteImport.update({
   path: '/water',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WeatherRoute = WeatherRouteImport.update({
+  id: '/weather',
+  path: '/weather',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/crops': typeof CropsRoute
+  '/livestock': typeof LivestockRoute
   '/soil': typeof SoilRoute
   '/water': typeof WaterRoute
+  '/weather': typeof WeatherRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/crops': typeof CropsRoute
+  '/livestock': typeof LivestockRoute
   '/soil': typeof SoilRoute
   '/water': typeof WaterRoute
+  '/weather': typeof WeatherRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/crops': typeof CropsRoute
+  '/livestock': typeof LivestockRoute
   '/soil': typeof SoilRoute
   '/water': typeof WaterRoute
+  '/weather': typeof WeatherRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/crops' | '/soil' | '/water'
+  fullPaths: '/' | '/crops' | '/livestock' | '/soil' | '/water' | '/weather'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/crops' | '/soil' | '/water'
-  id: '__root__' | '/' | '/crops' | '/soil' | '/water'
+  to: '/' | '/crops' | '/livestock' | '/soil' | '/water' | '/weather'
+  id:
+    '__root__' | '/' | '/crops' | '/livestock' | '/soil' | '/water' | '/weather'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CropsRoute: typeof CropsRoute
+  LivestockRoute: typeof LivestockRoute
   SoilRoute: typeof SoilRoute
   WaterRoute: typeof WaterRoute
+  WeatherRoute: typeof WeatherRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,6 +106,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CropsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/livestock': {
+      id: '/livestock'
+      path: '/livestock'
+      fullPath: '/livestock'
+      preLoaderRoute: typeof LivestockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/soil': {
       id: '/soil'
       path: '/soil'
@@ -99,14 +127,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WaterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/weather': {
+      id: '/weather'
+      path: '/weather'
+      fullPath: '/weather'
+      preLoaderRoute: typeof WeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CropsRoute: CropsRoute,
+  LivestockRoute: LivestockRoute,
   SoilRoute: SoilRoute,
   WaterRoute: WaterRoute,
+  WeatherRoute: WeatherRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
