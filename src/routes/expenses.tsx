@@ -36,7 +36,10 @@ function ExpensesPage() {
   const total = useMemo(() => rows.reduce((s, r) => s + r.amount, 0), [rows]);
   const income = yieldTonnes * pricePerTonne;
   const profit = income - total;
-  const biggest = useMemo(() => [...rows].sort((a, b) => b.amount - a.amount)[0], [rows]);
+  const biggest = useMemo(
+    () => [...rows].sort((a, b) => b.amount - a.amount)[0] ?? { category: "—", amount: 0 },
+    [rows],
+  );
 
   return (
     <div className="space-y-6">
