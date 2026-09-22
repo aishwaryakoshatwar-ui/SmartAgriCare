@@ -3,6 +3,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  Legend,
   Line,
   LineChart,
   Pie,
@@ -13,14 +14,7 @@ import {
   YAxis,
 } from "recharts";
 
-import {
-  diseaseRisk,
-  expenses,
-  predictedYield,
-  soilMoistureDay,
-  weatherForecast,
-  yieldTrend,
-} from "@/lib/farm-data";
+import { formatCompact } from "@/lib/datasets";
 
 const AXIS = { fontSize: 12, fill: "var(--muted-foreground)" };
 
@@ -32,40 +26,88 @@ const tooltipStyle = {
   fontSize: 12,
 };
 
-export function YieldTrendChart() {
+export interface Point {
+  name: string;
+  value: number;
+}
+
+const fmt = (v: number | string) =>
+  typeof v === "number" ? formatCompact(v, 2) : String(v);
+
+function Empty({ height }: { height: number }) {
   return (
-    <ResponsiveContainer width="100%" height={260}>
-      <LineChart data={yieldTrend} margin={{ left: -20, right: 8, top: 8 }}>
-        <CartesianGrid strokeDasharray="4 4" stroke="var(--border)" vertical={false} />
-        <XAxis dataKey="season" tick={AXIS} tickLine={false} axisLine={false} />
-        <YAxis tick={AXIS} tickLine={false} axisLine={false} unit="t" />
-        <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v} t/ha`, "Yield"]} />
-        <Line
-          type="monotone"
-          dataKey="yield"
-          stroke="var(--chart-1)"
-          strokeWidth={3}
-          dot={{ r: 4, fill: "var(--chart-1)" }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <div
+      className="grid place-items-center rounded-2xl bg-secondary/40 text-sm text-muted-foreground"
+      style={{ height }}
+    >
+      Data not available for this selection
+    </div>
   );
 }
 
-export function PredictedYieldChart() {
+export function BarChartView({
+  data,
+  label = "Value",
+  height = 260,
+  horizontal = false,
+  unit,
+}: {
+  data: Point[];
+  label?: string;
+  height?: number;
+  horizontal?: boolean;
+  unit?: string;
+}) {
+  if (!data.length) return <Empty height={height} />;
+
+  if (horizontal) {
+    return (
+      <ResponsiveContainer width="100%" height={height}>
+        <BarChart data={data} layout="vertical" margin={{ left: 12, right: 16, top: 8 }}>
+          <CartesianGrid strokeDasharray="4 4" stroke="var(--border)" horizontal={false} />
+          <XAxis type="number" tick={AXIS} tickLine={false} axisLine={false} tickFormatter={fmt} />
+          <YAxis
+            type="category"
+            dataKey="name"
+            width={110}
+            tick={AXIS}
+            tickLine={false}
+            axisLine={false}
+          />
+          <Tooltip
+            cursor={{ fill: "var(--muted)" }}
+            contentStyle={tooltipStyle}
+            formatter={(v) => [`${fmt(v as number)}${unit ? ` ${unit}` : ""}`, label]}
+          />
+          <Bar dataKey="value" radius={[0, 10, 10, 0]}>
+            {data.map((_, i) => (
+              <Cell key={i} fill={`var(--chart-${(i % 6) + 1})`} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    );
+  }
+
   return (
-    <ResponsiveContainer width="100%" height={260}>
-      <BarChart data={predictedYield} margin={{ left: -20, right: 8, top: 8 }}>
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart data={data} margin={{ left: -8, right: 8, top: 8, bottom: 4 }}>
         <CartesianGrid strokeDasharray="4 4" stroke="var(--border)" vertical={false} />
-        <XAxis dataKey="crop" tick={AXIS} tickLine={false} axisLine={false} />
-        <YAxis tick={AXIS} tickLine={false} axisLine={false} unit="t" />
+        <XAxis
+          dataKey="name"
+          tick={AXIS}
+          tickLine={false}
+          axisLine={false}
+          interval="preserveStartEnd"
+        />
+        <YAxis tick={AXIS} tickLine={false} axisLine={false} tickFormatter={fmt} width={54} />
         <Tooltip
           cursor={{ fill: "var(--muted)" }}
           contentStyle={tooltipStyle}
-          formatter={(v) => [`${v} t/ha`, "Predicted"]}
+          formatter={(v) => [`${fmt(v as number)}${unit ? ` ${unit}` : ""}`, label]}
         />
-        <Bar dataKey="yield" radius={[10, 10, 0, 0]}>
-          {predictedYield.map((_, i) => (
+        <Bar dataKey="value" radius={[10, 10, 0, 0]}>
+          {data.map((_, i) => (
             <Cell key={i} fill={`var(--chart-${(i % 6) + 1})`} />
           ))}
         </Bar>
@@ -74,64 +116,73 @@ export function PredictedYieldChart() {
   );
 }
 
-export function SoilMoistureChart() {
+export function LineChartView({
+  data,
+  label = "Value",
+  height = 260,
+  unit,
+  color = "var(--chart-1)",
+}: {
+  data: Point[];
+  label?: string;
+  height?: number;
+  unit?: string;
+  color?: string;
+}) {
+  if (!data.length) return <Empty height={height} />;
   return (
-    <ResponsiveContainer width="100%" height={260}>
-      <LineChart data={soilMoistureDay} margin={{ left: -20, right: 8, top: 8 }}>
+    <ResponsiveContainer width="100%" height={height}>
+      <LineChart data={data} margin={{ left: -8, right: 8, top: 8 }}>
         <CartesianGrid strokeDasharray="4 4" stroke="var(--border)" vertical={false} />
-        <XAxis dataKey="time" tick={AXIS} tickLine={false} axisLine={false} />
-        <YAxis tick={AXIS} tickLine={false} axisLine={false} unit="%" domain={[0, 60]} />
-        <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, "Moisture"]} />
+        <XAxis
+          dataKey="name"
+          tick={AXIS}
+          tickLine={false}
+          axisLine={false}
+          interval="preserveStartEnd"
+        />
+        <YAxis tick={AXIS} tickLine={false} axisLine={false} tickFormatter={fmt} width={54} />
+        <Tooltip
+          contentStyle={tooltipStyle}
+          formatter={(v) => [`${fmt(v as number)}${unit ? ` ${unit}` : ""}`, label]}
+        />
         <Line
           type="monotone"
-          dataKey="moisture"
-          stroke="var(--chart-3)"
+          dataKey="value"
+          stroke={color}
           strokeWidth={3}
-          dot={{ r: 4, fill: "var(--chart-3)" }}
+          dot={data.length > 30 ? false : { r: 3, fill: color }}
         />
       </LineChart>
     </ResponsiveContainer>
   );
 }
 
-export function DiseaseRiskChart() {
+export function PieChartView({
+  data,
+  label = "Records",
+  height = 280,
+}: {
+  data: Point[];
+  label?: string;
+  height?: number;
+}) {
+  if (!data.length) return <Empty height={height} />;
   return (
-    <ResponsiveContainer width="100%" height={240}>
-      <BarChart data={diseaseRisk} layout="vertical" margin={{ left: 10, right: 16 }}>
-        <CartesianGrid strokeDasharray="4 4" stroke="var(--border)" horizontal={false} />
-        <XAxis type="number" tick={AXIS} tickLine={false} axisLine={false} />
-        <YAxis type="category" dataKey="level" tick={AXIS} tickLine={false} axisLine={false} />
-        <Tooltip
-          cursor={{ fill: "var(--muted)" }}
-          contentStyle={tooltipStyle}
-          formatter={(v) => [`${v} plots`, "Plots"]}
-        />
-        <Bar dataKey="plots" radius={[0, 10, 10, 0]}>
-          {diseaseRisk.map((_, i) => (
-            <Cell key={i} fill={`var(--chart-${(i % 6) + 1})`} />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
-  );
-}
-
-export function ExpensePieChart() {
-  return (
-    <ResponsiveContainer width="100%" height={280}>
+    <ResponsiveContainer width="100%" height={height}>
       <PieChart>
-        <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`₹${v}`, "Spend"]} />
+        <Tooltip contentStyle={tooltipStyle} formatter={(v) => [fmt(v as number), label]} />
         <Pie
-          data={expenses}
-          dataKey="amount"
-          nameKey="category"
+          data={data}
+          dataKey="value"
+          nameKey="name"
           innerRadius={60}
           outerRadius={100}
           paddingAngle={3}
           label={({ name }) => name}
           labelLine={false}
         >
-          {expenses.map((_, i) => (
+          {data.map((_, i) => (
             <Cell key={i} fill={`var(--chart-${(i % 6) + 1})`} />
           ))}
         </Pie>
@@ -140,19 +191,29 @@ export function ExpensePieChart() {
   );
 }
 
-export function RainForecastChart() {
+export function GroupedBarChartView({
+  data,
+  keys,
+  xKey,
+  height = 300,
+}: {
+  data: Record<string, string | number>[];
+  keys: string[];
+  xKey: string;
+  height?: number;
+}) {
+  if (!data.length) return <Empty height={height} />;
   return (
-    <ResponsiveContainer width="100%" height={240}>
-      <BarChart data={weatherForecast} margin={{ left: -20, right: 8, top: 8 }}>
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart data={data} margin={{ left: -8, right: 8, top: 8 }}>
         <CartesianGrid strokeDasharray="4 4" stroke="var(--border)" vertical={false} />
-        <XAxis dataKey="day" tick={AXIS} tickLine={false} axisLine={false} />
-        <YAxis tick={AXIS} tickLine={false} axisLine={false} unit="%" />
-        <Tooltip
-          cursor={{ fill: "var(--muted)" }}
-          contentStyle={tooltipStyle}
-          formatter={(v) => [`${v}%`, "Rain chance"]}
-        />
-        <Bar dataKey="rain" radius={[10, 10, 0, 0]} fill="var(--chart-3)" />
+        <XAxis dataKey={xKey} tick={AXIS} tickLine={false} axisLine={false} />
+        <YAxis tick={AXIS} tickLine={false} axisLine={false} tickFormatter={fmt} width={54} />
+        <Tooltip cursor={{ fill: "var(--muted)" }} contentStyle={tooltipStyle} />
+        <Legend wrapperStyle={{ fontSize: 12 }} />
+        {keys.map((k, i) => (
+          <Bar key={k} dataKey={k} radius={[6, 6, 0, 0]} fill={`var(--chart-${(i % 6) + 1})`} />
+        ))}
       </BarChart>
     </ResponsiveContainer>
   );
