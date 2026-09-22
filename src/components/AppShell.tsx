@@ -2,7 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { Bell, Menu, UserRound, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
-import { alerts } from "@/lib/farm-data";
+import { datasetAlerts } from "@/lib/advisors";
+import { DATA_SOURCE_NOTE } from "@/lib/datasets";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -52,7 +53,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               <Bell className="size-5" />
               <span className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-destructive text-[11px] font-semibold text-destructive-foreground">
-                {alerts.length}
+                {datasetAlerts.length}
               </span>
             </Link>
             <button
@@ -93,9 +94,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           <p className="font-medium text-foreground">
             From Soil to Cattle, Weather to Wealth — One Smart Platform for the Entire Farm.
           </p>
+          <p className="mt-2 max-w-3xl">{DATA_SOURCE_NOTE}</p>
           <p className="mt-2 max-w-3xl">
-            SmartAgriCare is a decision-support prototype. All figures shown are illustrative sample
-            data. Outputs are recommendations only and do not replace professional veterinary or
+            Outputs are decision support only and do not replace professional veterinary or
             agronomic advice.
           </p>
         </div>

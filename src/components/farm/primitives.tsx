@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import type { Advisory } from "@/lib/farm-data";
+import type { Advisory } from "@/lib/advisors";
 import { cn } from "@/lib/utils";
 
 export function PageHeader({
@@ -61,7 +61,8 @@ export function Panel({
   );
 }
 
-export function SampleTag({ label = "Illustrative sample data" }: { label?: string }) {
+/** Small tag naming the dataset a panel was calculated from. */
+export function SourceTag({ label = "Dataset-calculated" }: { label?: string }) {
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-foreground">
       {label}
@@ -118,7 +119,7 @@ export function RiskPill({ risk }: { risk: Advisory["risk"] }) {
         ? "bg-warning text-warning-foreground"
         : "bg-success text-success-foreground";
   return (
-    <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", tone)}>{risk} risk</span>
+    <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", tone)}>{risk}</span>
   );
 }
 
@@ -133,6 +134,18 @@ export function AdvisoryCard({ advisory }: { advisory: Advisory }) {
         <RiskPill risk={advisory.risk} />
       </div>
       <p className="mt-3 text-sm leading-relaxed text-foreground/90">{advisory.message}</p>
+
+      {advisory.facts && advisory.facts.length > 0 && (
+        <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+          {advisory.facts.map((f) => (
+            <div key={f.label} className="rounded-2xl bg-background/70 p-3">
+              <dt className="text-xs text-muted-foreground">{f.label}</dt>
+              <dd className="text-lg font-semibold">{f.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
       <ul className="mt-4 space-y-2">
         {advisory.actions.map((action) => (
           <li key={action} className="flex gap-2 text-sm text-foreground/85">
@@ -144,8 +157,8 @@ export function AdvisoryCard({ advisory }: { advisory: Advisory }) {
         ))}
       </ul>
       <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
-        Decision support only. This is not a diagnosis and does not replace a qualified veterinarian
-        or agronomist.
+        Decision support based on historical dataset records. This is not a diagnosis and does not
+        replace a qualified veterinarian or agronomist.
       </p>
     </div>
   );
