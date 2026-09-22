@@ -102,15 +102,15 @@ const cy = cropYieldJson as {
 };
 
 export const cropYieldRows: CropYieldRow[] = cy.rows.map((r) => ({
-  crop: cy.crops[r[0]]!,
-  year: r[1]!,
-  season: cy.seasons[r[2]]!,
-  state: cy.states[r[3]]!,
-  area: r[4]!,
-  production: r[5]!,
-  fertilizer: r[6]!,
-  pesticide: r[7]!,
-  yield: r[8]!,
+  crop: cy.crops[r[0] ?? 0] ?? "",
+  year: r[1] ?? 0,
+  season: cy.seasons[r[2] ?? 0] ?? "",
+  state: cy.states[r[3] ?? 0] ?? "",
+  area: r[4] ?? 0,
+  production: r[5] ?? 0,
+  fertilizer: r[6] ?? 0,
+  pesticide: r[7] ?? 0,
+  yield: r[8] ?? 0,
 }));
 
 export const cropYieldOptions = {
