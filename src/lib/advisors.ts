@@ -296,7 +296,7 @@ export function buildDatasetAlerts(): DatasetAlert[] {
     );
 
   livestockData.animalDistribution.forEach((a) => {
-    const row = livestockData.diseaseByAnimal.find((r) => r.animal === a.name);
+    const row = livestockData.diseaseByAnimal.find((r) => r["animal"] === a.name);
     if (!row) return;
     const entries = Object.entries(row).filter(([k]) => k !== "animal") as [string, number][];
     const top = entries.sort((x, y) => y[1] - x[1])[0];
