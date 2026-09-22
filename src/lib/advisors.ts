@@ -221,7 +221,7 @@ export function getLivestockAdvisory(
           { label: "Avg recorded temperature", value: `${top.avgTemperature.toFixed(1)} °F` },
           { label: "Avg recorded age", value: `${top.avgAge.toFixed(1)} yrs` },
         ]
-      : undefined,
+      : [],
     match,
   };
 }
