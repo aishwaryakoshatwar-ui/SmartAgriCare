@@ -13,7 +13,7 @@
   "preview": "vite preview",
   "lint": "eslint .",
   "format": "prettier --write ."
-  }
+  },
   "overrides": {
     "rolldown": "1.2.1"
   },
